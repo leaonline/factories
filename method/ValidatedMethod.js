@@ -1,7 +1,7 @@
 /* global Roles */
 import { Meteor } from 'meteor/meteor'
 import { ValidatedMethod } from 'meteor/mdg:validated-method'
-import { PermissionDeniedError } from '../../api/errors/PermissionDenied'
+import { PermissionDeniedError } from 'meteor/leaonline:errors/PermissionDenied'
 
 const PermissionsMixin = function (options) {
   const runFct = options.run
@@ -65,7 +65,7 @@ class ExtendedValidatedMethod extends ValidatedMethod {
     if (Array.isArray(methodDefinition.mixins)) {
       methodDefinition.mixins = methodDefinition.mixins.concat(ErrorLogMixin, RoleMixin, PermissionsMixin)
     } else {
-      methodDefinition.mixins = [ErrorLogMixin, RoleMixin, PermissionsMixin]
+      methodDefinition.mixins = [ ErrorLogMixin, RoleMixin, PermissionsMixin ]
     }
 
     super(methodDefinition)
