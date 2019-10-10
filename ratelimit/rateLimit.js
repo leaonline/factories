@@ -69,8 +69,7 @@ export const rateLimitAccounts = ({
 export const runRateLimiter = (limitExceededCallback, sanityCheck = true) => {
   if (sanityCheck) {
     RateLimiterRegistry.sanityCheck(true)
+    console.info('[RateLimiterRegistry]: sanity check passed in strict mode')
   }
-  Meteor.startup(() => {
-    RateLimiterRegistry.run(limitExceededCallback)
-  })
+  RateLimiterRegistry.run(limitExceededCallback)
 }
