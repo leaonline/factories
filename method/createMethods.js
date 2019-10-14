@@ -15,7 +15,10 @@ export const getCreateMethod = (schemaResolver, validate = true, useRoles = true
     validationSchema.validate(document)
   }
 
-  return new ValidatedMethod({ name, validate, run, roles, group, isPublic })
+  const validatedMethod = new ValidatedMethod({ name, validate, run, roles, group, isPublic })
+  if (Meteor.isDevelopment) {
+    console.info(`[Method]: created ${name}`)
+  }
 }
 
 export const getCreateMethods = schemaResolver => {

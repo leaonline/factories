@@ -10,12 +10,17 @@ export const getCreatePublication = schemaResolver => ({ name, schema, projectio
   check(roles, isPublic ? maybe([ String ]) : [ String ])
   check(group, isPublic ? maybe(String) : String)
 
+  const isEmptySchema = Object.keys(schema).length === 0
   const validationSchema = schemaResolver(schema)
-  const validate = function validate (...args) {
-    validationSchema.validate(...args)
+  const validate = function validate (pubArgs = {}) {
+    validationSchema.validate(pubArgs)
   }
 
-  return ValidatedPublication({ name, validate, run, roles, group, isPublic })
+  const publication = ValidatedPublication({ name, validate, run, roles, group, isPublic })
+  if (Meteor.isDevelopment) {
+    console.info(`[Publication]: created ${name}`)
+  }
+  return publication
 }
 
 export const getCreatePublications = schemaResolver => {
