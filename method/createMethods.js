@@ -19,6 +19,7 @@ export const getCreateMethod = (schemaResolver, validate = true, useRoles = true
   if (Meteor.isDevelopment) {
     console.info(`[Method]: created ${name}`)
   }
+  return validatedMethod
 }
 
 export const getCreateMethods = schemaResolver => {
@@ -26,7 +27,7 @@ export const getCreateMethods = schemaResolver => {
   return methods => {
     check(methods, [ isObject ])
     return methods.map(method => {
-      createMethod(method)
+      return createMethod(method)
     })
   }
 }
