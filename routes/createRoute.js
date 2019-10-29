@@ -7,6 +7,8 @@ const isHttpMethod = Match.Where(x => httpMethods.includes(x))
 const webApp = WebApp.connectHandlers
 
 const handleError = function ({ error, title, description, code, res }) {
+  console.log(code, title, description)
+  console.error(error)
   res.writeHead(code, { 'Content-Type': 'application/json' })
   const body = JSON.stringify({
     title: title,
@@ -16,8 +18,8 @@ const handleError = function ({ error, title, description, code, res }) {
   res.end(body)
 }
 
-export const getCreateRoutes = schemaResolver => {
-  const createRoute = getCreateRoute(schemaResolver)
+export const getCreateRoutes = (schemaResolver, allowedOrigins) => {
+  const createRoute = getCreateRoute(schemaResolver, allowedOrigins)
   return routes => {
     check(routes, [ isObject ])
     return routes.map(route => {
@@ -26,13 +28,14 @@ export const getCreateRoutes = schemaResolver => {
   }
 }
 
-export const getCreateRoute = schemaResolver => {
+export const getCreateRoute = (schemaResolver, allowedOrigins) => {
   check(schemaResolver, Function)
   return ({ path, schema, method, run, hasNext }) => {
     check(path, String)
     check(schema, isObject)
     check(method, isHttpMethod)
     check(run, Function)
+    check(allowedOrigins, [ String ])
     check(hasNext, Match.Maybe(Boolean))
 
     const validationSchema = schemaResolver(schema)
@@ -40,11 +43,25 @@ export const getCreateRoute = schemaResolver => {
       validationSchema.validate(...args)
     }
 
+    const allowHeader = `${method.toUpperCase()}, OPTIONS`
+
     const handler = function (req, res, next) {
-      // first we validate the query / body
+      res.setHeader('Access-Control-Allow-Methods', allowHeader)
+
+      // we check first for any unregular origins
+      const originIndex = allowedOrigins.indexOf(req.headers.origin)
+      if (originIndex > -1 && originIndex < allowedOrigins.length) {
+        res.setHeader('Access-Control-Allow-Origin', allowedOrigins[ originIndex ])
+      } else {
+        // FIXME IMPORTANT
+        // LOG ATTEMPT FROM ANY OTHER ORIGIN
+      }
+
+      // then we validate the query / body
+      let query
+
       try {
-        let query
-        switch (method) {
+        switch (method.toLowerCase()) {
           case 'post':
             query = req.body
             break
