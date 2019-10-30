@@ -7,6 +7,8 @@ const isHttpMethod = Match.Where(x => httpMethods.includes(x))
 const webApp = WebApp.connectHandlers
 
 const handleError = function ({ error, title, description, code, res }) {
+  console.error(code, title, description)
+  console.error(error)
   res.writeHead(code, { 'Content-Type': 'application/json' })
   const body = JSON.stringify({
     title: title,
@@ -16,8 +18,8 @@ const handleError = function ({ error, title, description, code, res }) {
   res.end(body)
 }
 
-export const getCreateRoutes = schemaResolver => {
-  const createRoute = getCreateRoute(schemaResolver)
+export const getCreateRoutes = (schemaResolver, authenticateHandlers) => {
+  const createRoute = getCreateRoute(schemaResolver, authenticateHandlers)
   return routes => {
     check(routes, [ isObject ])
     return routes.map(route => {
@@ -26,13 +28,14 @@ export const getCreateRoutes = schemaResolver => {
   }
 }
 
-export const getCreateRoute = schemaResolver => {
+export const getCreateRoute = (schemaResolver, authenticateHandlers) => {
   check(schemaResolver, Function)
   return ({ path, schema, method, run, hasNext }) => {
     check(path, String)
     check(schema, isObject)
     check(method, isHttpMethod)
     check(run, Function)
+    check(authenticateHandlers, [String])
     check(hasNext, Match.Maybe(Boolean))
 
     const validationSchema = schemaResolver(schema)
@@ -40,10 +43,30 @@ export const getCreateRoute = schemaResolver => {
       validationSchema.validate(...args)
     }
 
+    const allowMethods = `${method.toUpperCase()}, OPTIONS`
+
     const handler = function (req, res, next) {
-      // first we validate the query / body
+      // verify the origin first
+      const { origin } = req.headers
+      if (authenticateHandlers.includes(origin)) {
+        const originIndex = authenticateHandlers.indexOf(origin)
+        res.setHeader('Access-Control-Allow-Origin', authenticateHandlers[originIndex])
+      }
+
+      // then validate the method
+      res.setHeader('Access-Control-Allow-Methods', allowMethods)
+      if (req.method.toLowerCase() !== method) {
+        handleError({
+          error: new Error(''),
+          title: 'Method Not Allowed',
+          description: 'THe request used an unawlloed method.',
+          code: 405
+        })
+      }
+
+      // then we validate the query / body
+      let query
       try {
-        let query
         switch (method) {
           case 'post':
             query = req.body
