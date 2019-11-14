@@ -7,7 +7,7 @@ const isHttpMethod = Match.Where(x => httpMethods.includes(x))
 const webApp = WebApp.connectHandlers
 
 const handleError = function ({ error, title, description, code, res }) {
-  console.log(code, title, description)
+  console.error(code, title, description)
   console.error(error)
   res.writeHead(code, { 'Content-Type': 'application/json' })
   const body = JSON.stringify({
@@ -18,8 +18,8 @@ const handleError = function ({ error, title, description, code, res }) {
   res.end(body)
 }
 
-export const getCreateRoutes = (schemaResolver, allowedOrigins) => {
-  const createRoute = getCreateRoute(schemaResolver, allowedOrigins)
+export const getCreateRoutes = (schemaResolver, authenticateHandlers) => {
+  const createRoute = getCreateRoute(schemaResolver, authenticateHandlers)
   return routes => {
     check(routes, [ isObject ])
     return routes.map(route => {
@@ -43,18 +43,25 @@ export const getCreateRoute = (schemaResolver, allowedOrigins) => {
       validationSchema.validate(...args)
     }
 
-    const allowHeader = `${method.toUpperCase()}, OPTIONS`
+    const allowMethods = `${method.toUpperCase()}, OPTIONS`
 
     const handler = function (req, res, next) {
-      res.setHeader('Access-Control-Allow-Methods', allowHeader)
-
-      // we check first for any unregular origins
-      const originIndex = allowedOrigins.indexOf(req.headers.origin)
-      if (originIndex > -1 && originIndex < allowedOrigins.length) {
+      // verify the origin first
+      const { origin } = req.headers
+      if (allowedOrigins.includes(origin)) {
+        const originIndex = allowedOrigins.indexOf(origin)
         res.setHeader('Access-Control-Allow-Origin', allowedOrigins[ originIndex ])
-      } else {
-        // FIXME IMPORTANT
-        // LOG ATTEMPT FROM ANY OTHER ORIGIN
+      }
+
+      // then validate the method
+      res.setHeader('Access-Control-Allow-Methods', allowMethods)
+      if (req.method.toLowerCase() !== method) {
+        handleError({
+          error: new Error(''),
+          title: 'Method Not Allowed',
+          description: 'THe request used an unawlloed method.',
+          code: 405
+        })
       }
 
       // then we validate the query / body
