@@ -18,8 +18,8 @@ const handleError = function ({ error, title, description, code, res }) {
   res.end(body)
 }
 
-export const getCreateRoutes = (schemaResolver, authenticateHandlers) => {
-  const createRoute = getCreateRoute(schemaResolver, authenticateHandlers)
+export const getCreateRoutes = (schemaResolver, authenticateHandlers, debug) => {
+  const createRoute = getCreateRoute(schemaResolver, authenticateHandlers, debug)
   return routes => {
     check(routes, [ isObject ])
     return routes.map(route => {
@@ -28,8 +28,10 @@ export const getCreateRoutes = (schemaResolver, authenticateHandlers) => {
   }
 }
 
-export const getCreateRoute = (schemaResolver, allowedOrigins) => {
+export const getCreateRoute = (schemaResolver, allowedOrigins, debug) => {
   check(schemaResolver, Function)
+  check(allowedOrigins, [String])
+
   return ({ path, schema, method, run, hasNext }) => {
     check(path, String)
     check(schema, isObject)
@@ -51,15 +53,16 @@ export const getCreateRoute = (schemaResolver, allowedOrigins) => {
       if (allowedOrigins.includes(origin)) {
         const originIndex = allowedOrigins.indexOf(origin)
         res.setHeader('Access-Control-Allow-Origin', allowedOrigins[ originIndex ])
+        res.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token');
       }
 
       // then validate the method
       res.setHeader('Access-Control-Allow-Methods', allowMethods)
-      if (req.method.toLowerCase() !== method) {
-        handleError({
+      if (!allowMethods.includes(req.method.toUpperCase())) {
+        return handleError({
           error: new Error(''),
-          title: 'Method Not Allowed',
-          description: 'THe request used an unawlloed method.',
+          title: `Method Not Allowed`,
+          description: `The request used an unallowed method. (${req.method})`,
           code: 405
         })
       }
