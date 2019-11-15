@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor'
 import { WebApp } from 'meteor/webapp'
 import { check, Match } from 'meteor/check'
 import { isObject } from '../utils'
@@ -53,7 +54,7 @@ export const getCreateRoute = (schemaResolver, allowedOrigins, debug) => {
       if (allowedOrigins.includes(origin)) {
         const originIndex = allowedOrigins.indexOf(origin)
         res.setHeader('Access-Control-Allow-Origin', allowedOrigins[ originIndex ])
-        res.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token');
+        res.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token')
       }
 
       // then validate the method

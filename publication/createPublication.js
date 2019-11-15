@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor'
 import { isObject, maybe } from '../utils'
 import { check } from 'meteor/check'
 import { ValidatedPublication } from './ValidatedPublication'
@@ -10,7 +11,6 @@ export const getCreatePublication = schemaResolver => ({ name, schema, projectio
   check(roles, isPublic ? maybe([ String ]) : [ String ])
   check(group, isPublic ? maybe(String) : String)
 
-  const isEmptySchema = Object.keys(schema).length === 0
   const validationSchema = schemaResolver(schema)
   const validate = function validate (pubArgs = {}) {
     validationSchema.validate(pubArgs)

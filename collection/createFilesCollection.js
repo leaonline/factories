@@ -1,3 +1,5 @@
+/* global Roles */
+import { Meteor } from 'meteor/meteor'
 import { FilesCollection } from 'meteor/ostrio:files'
 
 export const getCreateFilesCollection = ({ i18n, fs, bucket, createObjectId }) => {
@@ -49,8 +51,8 @@ export const getCreateFilesCollection = ({ i18n, fs, bucket, createObjectId }) =
       return true
     }
 
-
     function beforeRemove () {
+      const self = this
       const userChecked = checkUser(self)
       return typeof userChecked === 'undefined'
     }
@@ -79,11 +81,7 @@ export const getCreateFilesCollection = ({ i18n, fs, bucket, createObjectId }) =
         fs.createReadStream(file.versions[ versionName ].path)
 
         // this is where we upload the binary to the bucket
-          .pipe(bucket.openUploadStream(file.name, {
-              contentType: file.type || 'binary/octet-stream',
-              metadata
-            }
-          ))
+          .pipe(bucket.openUploadStream(file.name, { contentType: file.type || 'binary/octet-stream', metadata }))
 
           // and we unlink the file from the fs on any error
           // that occurred during the upload to prevent zombie files

@@ -1,4 +1,4 @@
-import { check, Match } from 'meteor/check'
+import { check } from 'meteor/check'
 import { SHA256 } from 'meteor/sha'
 import { Meteor } from 'meteor/meteor'
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter'

@@ -1,8 +1,9 @@
-import { check, Match } from 'meteor/check'
+import { Meteor } from 'meteor/meteor'
+import { check } from 'meteor/check'
 import { isObject, maybe } from '../utils'
 import ValidatedMethod from './ValidatedMethod'
 
-export const getCreateMethod = (schemaResolver, validate = true, useRoles = true)=> ({ name, schema, run, roles, group, isPublic }) => {
+export const getCreateMethod = (schemaResolver, validate = true, useRoles = true) => ({ name, schema, run, roles, group, isPublic }) => {
   check(name, String)
   check(schema, isObject)
   check(run, Function)

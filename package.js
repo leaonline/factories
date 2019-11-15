@@ -1,3 +1,4 @@
+/* eslint-env meteor */
 Package.describe({
   name: 'leaonline:factories',
   version: '1.1.0',

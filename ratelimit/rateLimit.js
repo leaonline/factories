@@ -24,33 +24,33 @@ const rateLimitPublication = ({ name, userId, connectionId, clientAddress, numRe
 }
 
 export const rateLimitAccounts = ({
-                                    numRequestsMethods = 5,
-                                    timIntervalMethods = 10000,
-                                    numRequestsPublications = 20,
-                                    timeIntervalPublications = 10000,
-                                    accountMethods = [
-                                      'login',
-                                      'loginWithToken',
-                                      'logout',
-                                      'logoutOtherClients',
-                                      'getNewToken',
-                                      'removeOtherTokens',
-                                      'configureLoginService',
-                                      'changePassword',
-                                      'forgotPassword',
-                                      'resetPassword',
-                                      'verifyEmail',
-                                      'createUser',
-                                      'ATRemoveService',
-                                      'ATCreateUserServer',
-                                      'ATResendVerificationEmail'
-                                    ],
-                                    accountPublications = [
-                                      'meteor.loginServiceConfiguration',
-                                      'meteor_autoupdate_clientVersions',
-                                      '_roles'
-                                    ]
-                                  } = {}) => {
+  numRequestsMethods = 5,
+  timIntervalMethods = 10000,
+  numRequestsPublications = 20,
+  timeIntervalPublications = 10000,
+  accountMethods = [
+    'login',
+    'loginWithToken',
+    'logout',
+    'logoutOtherClients',
+    'getNewToken',
+    'removeOtherTokens',
+    'configureLoginService',
+    'changePassword',
+    'forgotPassword',
+    'resetPassword',
+    'verifyEmail',
+    'createUser',
+    'ATRemoveService',
+    'ATCreateUserServer',
+    'ATResendVerificationEmail'
+  ],
+  accountPublications = [
+    'meteor.loginServiceConfiguration',
+    'meteor_autoupdate_clientVersions',
+    '_roles'
+  ]
+} = {}) => {
   Accounts.removeDefaultRateLimit()
 
   accountMethods.forEach(name => RateLimiterRegistry.addMethod({
