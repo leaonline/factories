@@ -31,7 +31,7 @@ export const getCreateRoutes = (schemaResolver, authenticateHandlers, debug) => 
 
 export const getCreateRoute = (schemaResolver, allowedOrigins, debug) => {
   check(schemaResolver, Function)
-  check(allowedOrigins, [String])
+  check(allowedOrigins, [ String ])
 
   return ({ path, schema, method, run, hasNext }) => {
     check(path, String)
@@ -47,6 +47,7 @@ export const getCreateRoute = (schemaResolver, allowedOrigins, debug) => {
     }
 
     const allowMethods = `${method.toUpperCase()}, OPTIONS`
+    const executionContext = Meteor.bindEnvironment(run)
 
     const handler = function (req, res, next) {
       // verify the origin first
@@ -97,7 +98,7 @@ export const getCreateRoute = (schemaResolver, allowedOrigins, debug) => {
       // then we run the context
       let result
       try {
-        const tmp = run(query)
+        const tmp = executionContext.call(this, query)
         result = JSON.stringify(tmp)
       } catch (invocationError) {
         return handleError({
