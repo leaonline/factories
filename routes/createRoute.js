@@ -52,10 +52,12 @@ export const getCreateRoute = (schemaResolver, allowedOrigins, debug) => {
     const handler = function (req, res, next) {
       // verify the origin first
       const { origin } = req.headers
+
       if (allowedOrigins.includes(origin)) {
         const originIndex = allowedOrigins.indexOf(origin)
         res.setHeader('Access-Control-Allow-Origin', allowedOrigins[ originIndex ])
-        res.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token')
+        res.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token, Accept')
+        res.setHeader('Access-Control-Allow-Credentials', 'true')
       }
 
       // then validate the method
@@ -69,9 +71,14 @@ export const getCreateRoute = (schemaResolver, allowedOrigins, debug) => {
         })
       }
 
-      // then we validate the query / body
-      let query
+      // end the request here, if it's a preflight
+      if (req.method.toLowerCase() === 'options') {
+        res.writeHead(200)
+        res.end()
+      }
 
+      // then we validate the query / body or end
+      let query
       try {
         switch (method.toLowerCase()) {
           case 'post':
@@ -99,7 +106,7 @@ export const getCreateRoute = (schemaResolver, allowedOrigins, debug) => {
       let result
       try {
         const tmp = executionContext.call(this, query)
-        result = JSON.stringify(tmp)
+        result = JSON.stringify(tmp || {})
       } catch (invocationError) {
         return handleError({
           res,
