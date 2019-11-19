@@ -64,6 +64,7 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
       res.setHeader('Access-Control-Allow-Methods', allowMethods)
       if (!allowMethods.includes(req.method.toUpperCase())) {
         return handleError({
+          res,
           error: new Error(''),
           title: `Method Not Allowed`,
           description: `The request used an unallowed method. (${req.method})`,
@@ -80,7 +81,8 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
       // validate the xAuthToken, if defined
       if (tokenRequired && xAuthToken !== req.headers['x-auth-token']) {
         return handleError({
-          error: new Error(''),
+          res,
+          error: new Error('permission denied'),
           title: `Permission denied`,
           description: `You are not allowed to request this method`,
           code: 403
