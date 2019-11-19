@@ -19,8 +19,8 @@ const handleError = function ({ error, title, description, code, res }) {
   res.end(body)
 }
 
-export const getCreateRoutes = (schemaResolver, authenticateHandlers, debug) => {
-  const createRoute = getCreateRoute(schemaResolver, authenticateHandlers, debug)
+export const getCreateRoutes = ({ schemaResolver, allowedOrigins, xAuthToken, debug }) => {
+  const createRoute = getCreateRoute({ schemaResolver, allowedOrigins, xAuthToken, debug })
   return routes => {
     check(routes, [ isObject ])
     return routes.map(route => {
@@ -29,17 +29,18 @@ export const getCreateRoutes = (schemaResolver, authenticateHandlers, debug) => 
   }
 }
 
-export const getCreateRoute = (schemaResolver, allowedOrigins, debug) => {
+export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthToken }) => {
   check(schemaResolver, Function)
   check(allowedOrigins, [ String ])
 
-  return ({ path, schema, method, run, hasNext }) => {
+  return ({ path, schema, method, run, hasNext, tokenRequired }) => {
     check(path, String)
     check(schema, isObject)
     check(method, isHttpMethod)
     check(run, Function)
     check(allowedOrigins, [ String ])
     check(hasNext, Match.Maybe(Boolean))
+    check(tokenRequired, Match.Maybe(Boolean))
 
     const validationSchema = schemaResolver(schema)
     const validate = function (...args) {
@@ -52,7 +53,6 @@ export const getCreateRoute = (schemaResolver, allowedOrigins, debug) => {
     const handler = function (req, res, next) {
       // verify the origin first
       const { origin } = req.headers
-
       if (allowedOrigins.includes(origin)) {
         const originIndex = allowedOrigins.indexOf(origin)
         res.setHeader('Access-Control-Allow-Origin', allowedOrigins[ originIndex ])
@@ -75,6 +75,16 @@ export const getCreateRoute = (schemaResolver, allowedOrigins, debug) => {
       if (req.method.toLowerCase() === 'options') {
         res.writeHead(200)
         res.end()
+      }
+
+      // validate the xAuthToken, if defined
+      if (tokenRequired && xAuthToken !== req.headers['x-auth-token']) {
+        return handleError({
+          error: new Error(''),
+          title: `Permission denied`,
+          description: `You are not allowed to request this method`,
+          code: 403
+        })
       }
 
       // then we validate the query / body or end
