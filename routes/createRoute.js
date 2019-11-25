@@ -29,6 +29,8 @@ export const getCreateRoutes = ({ schemaResolver, allowedOrigins, xAuthToken, de
   }
 }
 
+const log = (...args) => Meteor.isDevelopment && console.log(...args)
+
 export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthToken }) => {
   check(schemaResolver, Function)
   check(allowedOrigins, [ String ])
@@ -51,6 +53,13 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
     const executionContext = Meteor.bindEnvironment(run)
 
     const handler = function (req, res, next) {
+      if (debug) {
+        log(path)
+        log(req.method)
+        log(req.headers)
+        log(req.query)
+        log(req.body)
+      }
       // verify the origin first
       const { origin } = req.headers
       if (allowedOrigins.includes(origin)) {
@@ -79,7 +88,7 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
       }
 
       // validate the xAuthToken, if defined
-      if (tokenRequired && xAuthToken !== req.headers['x-auth-token']) {
+      if (tokenRequired && xAuthToken !== req.headers[ 'x-auth-token' ]) {
         return handleError({
           res,
           error: new Error('permission denied'),
