@@ -10,7 +10,8 @@ const webApp = WebApp.connectHandlers
 const handleError = function ({ error, title, description, code, res }) {
   console.error(code, title, description)
   console.error(error)
-  res.writeHead(code, { 'Content-Type': 'application/json' })
+  res.setHeader('Content-Type', 'application/json')
+  res.writeHead(code)
   const body = JSON.stringify({
     title: title,
     description: description,
@@ -84,7 +85,7 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
       // end the request here, if it's a preflight
       if (req.method.toLowerCase() === 'options') {
         res.writeHead(200)
-        res.end()
+        return res.end()
       }
 
       // validate the xAuthToken, if defined
@@ -154,7 +155,7 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
       }
 
       res.writeHead(200, { 'Content-Type': 'application/json' })
-      res.end(result)
+      return res.end(result)
     }
 
     switch (method) {
