@@ -8,12 +8,13 @@ export const getCreatePublication = schemaResolver => ({ name, schema, projectio
   check(schema, isObject)
   check(run, Function)
   check(isPublic, maybe(Boolean))
-  check(roles, isPublic ? maybe([ String ]) : [ String ])
+  check(roles, isPublic ? maybe([String]) : [String])
   check(group, isPublic ? maybe(String) : String)
 
   const validationSchema = schemaResolver(schema)
-  const validate = function validate (pubArgs = {}) {
-    validationSchema.validate(pubArgs)
+  const validate = function validate (...args) {
+    validationSchema.validate(...args)
+    return true
   }
 
   const publication = ValidatedPublication({ name, validate, run, roles, group, isPublic })
@@ -26,7 +27,7 @@ export const getCreatePublication = schemaResolver => ({ name, schema, projectio
 export const getCreatePublications = schemaResolver => {
   const createPublication = getCreatePublication(schemaResolver)
   return methods => {
-    check(methods, [ isObject ])
+    check(methods, [isObject])
     return methods.map(createPublication)
   }
 }
