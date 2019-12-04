@@ -145,7 +145,7 @@ export const getCreateFilesCollection = ({ i18n, fs, bucket, createObjectId }) =
       collectionName: name,
       collection: collection,
       ddp: ddp,
-      debug: debug,
+      debug: Meteor.isDevelopment && debug,
       allowedOrigins: allowedOrigins,
       onbeforeunloadMessage: Meteor.isClient && (() => i18n.get('filesCollection.onbeforeunloadMessage')),
       onBeforeUpload: beforeUpload,

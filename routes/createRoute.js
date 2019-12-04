@@ -68,6 +68,8 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
         res.setHeader('Access-Control-Allow-Origin', allowedOrigins[ originIndex ])
         res.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token, Accept')
         res.setHeader('Access-Control-Allow-Credentials', 'true')
+      } else {
+        console.warn(`${method} ${path}: skip not allowed origin [${origin}]`)
       }
 
       // then validate the method
