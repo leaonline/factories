@@ -36,6 +36,9 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
   check(schemaResolver, Function)
   check(allowedOrigins, [ String ])
 
+  const originRegexps = allowedOrigins.map(str => new RegExp(str, 'i'))
+  const isValidOrigin = origin => originRegexps.some(regExp => regExp.test(origin))
+
   return ({ path, schema, method, run, hasNext, tokenRequired }) => {
     check(path, String)
     check(schema, isObject)
@@ -63,13 +66,14 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
       }
       // verify the origin first
       const { origin } = req.headers
-      if (allowedOrigins.includes(origin)) {
-        const originIndex = allowedOrigins.indexOf(origin)
-        res.setHeader('Access-Control-Allow-Origin', allowedOrigins[ originIndex ])
+      if (isValidOrigin(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin)
         res.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token, Accept')
         res.setHeader('Access-Control-Allow-Credentials', 'true')
       } else {
         console.warn(`${method} ${path}: skip not allowed origin [${origin}]`)
+        console.log(allowedOrigins)
+        console.log(req.headers)
       }
 
       // then validate the method
