@@ -2,21 +2,18 @@
 import { Meteor } from 'meteor/meteor'
 import { check, Match } from 'meteor/check'
 
-const allArguments = args => args && true
-
 export const ValidatedPublication = ({ name, validate, run, roles, group, isPublic }) => {
   const publication = function (...args) {
     check(args, Match.Where(validate))
     // we use our own validation using the schema
     // validator from the createPublication method
 
-
     const self = this
     const { userId } = self
 
     // first validate permissions
     if (!isPublic && !Roles.userIsInRole(userId, roles, group)) {
-      console.info(`[Publication]: skip due to permission denied.`)
+      console.info('[Publication]: skip due to permission denied.')
       return self.ready()
     }
 

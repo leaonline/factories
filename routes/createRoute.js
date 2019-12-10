@@ -3,7 +3,7 @@ import { WebApp } from 'meteor/webapp'
 import { check, Match } from 'meteor/check'
 import { isObject } from '../utils'
 
-const httpMethods = [ 'get', 'post', 'put', 'delete', 'options' ]
+const httpMethods = ['get', 'post', 'put', 'delete', 'options']
 const isHttpMethod = Match.Where(x => httpMethods.includes(x))
 const webApp = WebApp.connectHandlers
 
@@ -23,7 +23,7 @@ const handleError = function ({ error, title, description, code, res }) {
 export const getCreateRoutes = ({ schemaResolver, allowedOrigins, xAuthToken, debug }) => {
   const createRoute = getCreateRoute({ schemaResolver, allowedOrigins, xAuthToken, debug })
   return routes => {
-    check(routes, [ isObject ])
+    check(routes, [isObject])
     return routes.map(route => {
       return createRoute(route)
     })
@@ -34,7 +34,7 @@ const log = (...args) => Meteor.isDevelopment && console.log(...args)
 
 export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthToken }) => {
   check(schemaResolver, Function)
-  check(allowedOrigins, [ String ])
+  check(allowedOrigins, [String])
 
   const originRegexps = allowedOrigins.map(str => new RegExp(str, 'i'))
   const isValidOrigin = origin => originRegexps.some(regExp => regExp.test(origin))
@@ -44,7 +44,7 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
     check(schema, isObject)
     check(method, isHttpMethod)
     check(run, Function)
-    check(allowedOrigins, [ String ])
+    check(allowedOrigins, [String])
     check(hasNext, Match.Maybe(Boolean))
     check(tokenRequired, Match.Maybe(Boolean))
 
@@ -82,7 +82,7 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
         return handleError({
           res,
           error: new Error(''),
-          title: `Method Not Allowed`,
+          title: 'Method Not Allowed',
           description: `The request used an unallowed method. (${req.method})`,
           code: 405
         })
@@ -95,12 +95,12 @@ export const getCreateRoute = ({ schemaResolver, allowedOrigins, debug, xAuthTok
       }
 
       // validate the xAuthToken, if defined
-      if (tokenRequired && xAuthToken !== req.headers[ 'x-auth-token' ]) {
+      if (tokenRequired && xAuthToken !== req.headers['x-auth-token']) {
         return handleError({
           res,
           error: new Error('permission denied'),
-          title: `Permission denied`,
-          description: `You are not allowed to request this method`,
+          title: 'Permission denied',
+          description: 'You are not allowed to request this method',
           code: 403
         })
       }

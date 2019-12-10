@@ -45,7 +45,7 @@ function _run (map, type, limitExceededCallback) {
     const { clientAddress } = ruleGroup
 
     function name (name) {
-      return !!(names[ name ])
+      return !!(names[name])
     }
 
     const ruleId = DDPRateLimiter.addRule({
@@ -55,19 +55,19 @@ function _run (map, type, limitExceededCallback) {
       connectionId: (connectionId || defaultConnectionId),
       clientAddress: (clientAddress || defaultClientAddress)
     }, numRequests, timeInterval, limitExceededCallback)
-    _rules[ ruleId ] = name
+    _rules[ruleId] = name
   })
 }
 
 function add (target, { name, userId, connectionId, clientAddress, numRequests, timeInterval }) {
   const argsStr = JSON.stringify({ userId, connectionId, clientAddress, numRequests, timeInterval })
   const key = SHA256(argsStr)
-  if (!target[ key ]) {
+  if (!target[key]) {
     const names = {}
-    target[ key ] = { names, userId, connectionId, clientAddress, numRequests, timeInterval }
+    target[key] = { names, userId, connectionId, clientAddress, numRequests, timeInterval }
   }
-  target[ key ].names[ name ] = true
-  _names[ name ] = true
+  target[key].names[name] = true
+  _names[name] = true
   return true
 }
 
@@ -99,15 +99,15 @@ export const RateLimiterRegistry = {
   },
 
   has (name) {
-    return !!(_names[ name ])
+    return !!(_names[name])
   },
 
   remove (id) {
-    if (_rules[ id ]) {
+    if (_rules[id]) {
       DDPRateLimiter.removeRule(id)
-      const name = _rules[ id ]
-      delete _rules[ id ]
-      delete _names[ name ]
+      const name = _rules[id]
+      delete _rules[id]
+      delete _names[name]
     }
   },
 

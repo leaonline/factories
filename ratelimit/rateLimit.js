@@ -4,7 +4,7 @@ import { isObject } from '../utils'
 import { Accounts } from 'meteor/accounts-base'
 
 export const rateLimitMethods = methods => {
-  check(methods, [ isObject ])
+  check(methods, [isObject])
   return methods.map(rateLimitMethod)
 }
 
@@ -14,7 +14,7 @@ const rateLimitMethod = ({ name, userId, connectionId, clientAddress, numRequest
 }
 
 export const rateLimitPublications = publications => {
-  check(publications, [ isObject ])
+  check(publications, [isObject])
   return publications.map(rateLimitPublication)
 }
 

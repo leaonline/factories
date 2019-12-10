@@ -78,7 +78,7 @@ export const getCreateFilesCollection = ({ i18n, fs, bucket, createObjectId }) =
       // then we read all versions we have got so far
       Object.keys(file.versions).forEach(versionName => {
         const metadata = { ...file.meta, versionName, fileId: file._id }
-        fs.createReadStream(file.versions[ versionName ].path)
+        fs.createReadStream(file.versions[versionName].path)
 
         // this is where we upload the binary to the bucket
           .pipe(bucket.openUploadStream(file.name, { contentType: file.type || 'binary/octet-stream', metadata }))
@@ -94,7 +94,7 @@ export const getCreateFilesCollection = ({ i18n, fs, bucket, createObjectId }) =
             const property = `versions.${versionName}.meta.gridFsFileId`
             Collection.update(file._id, {
               $set: {
-                [ property ]: ver._id.toHexString()
+                [property]: ver._id.toHexString()
               }
             })
             self.unlink(Collection.findOne(file._id), versionName) // Unlink files from FS
@@ -104,7 +104,7 @@ export const getCreateFilesCollection = ({ i18n, fs, bucket, createObjectId }) =
 
     function interceptDownload (http, file, versionName) {
       const self = this
-      const { gridFsFileId } = file.versions[ versionName ].meta || {}
+      const { gridFsFileId } = file.versions[versionName].meta || {}
       if (gridFsFileId) {
         const gfsId = createObjectId({ gridFsFileId })
         const readStream = bucket.openDownloadStream(gfsId)
@@ -132,7 +132,7 @@ export const getCreateFilesCollection = ({ i18n, fs, bucket, createObjectId }) =
     function afterRemove (files) {
       files.forEach(file => {
         Object.keys(file.versions).forEach(versionName => {
-          const gridFsFileId = (file.versions[ versionName ].meta || {}).gridFsFileId
+          const gridFsFileId = (file.versions[versionName].meta || {}).gridFsFileId
           if (gridFsFileId) {
             const gfsId = createObjectId({ gridFsFileId })
             bucket.delete(gfsId, err => { if (err) console.error(err) })

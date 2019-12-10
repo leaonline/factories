@@ -8,7 +8,7 @@ export const getCreateMethod = (schemaResolver, validate = true, useRoles = true
   check(schema, isObject)
   check(run, Function)
   check(isPublic, maybe(Boolean))
-  check(roles, isPublic ? maybe([ String ]) : [ String ])
+  check(roles, isPublic ? maybe([String]) : [String])
   check(group, isPublic ? maybe(String) : String)
 
   const validationSchema = schemaResolver(schema)
@@ -26,7 +26,7 @@ export const getCreateMethod = (schemaResolver, validate = true, useRoles = true
 export const getCreateMethods = schemaResolver => {
   const createMethod = getCreateMethod(schemaResolver)
   return methods => {
-    check(methods, [ isObject ])
+    check(methods, [isObject])
     return methods.map(method => {
       return createMethod(method)
     })
