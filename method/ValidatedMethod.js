@@ -1,7 +1,7 @@
 /* global Roles */
 import { Meteor } from 'meteor/meteor'
 import { ValidatedMethod } from 'meteor/mdg:validated-method'
-import { PermissionDeniedError } from 'meteor/leaonline:errors/PermissionDenied'
+import { PermissionDeniedError } from '../common/PermissionDeniedError'
 
 const PermissionsMixin = function (options) {
   const runFct = options.run
