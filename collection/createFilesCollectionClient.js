@@ -58,7 +58,7 @@ export const getCreateFilesCollection = ({ i18n }) => {
       debug: Meteor.isDevelopment && debug,
       onbeforeunloadMessage: Meteor.isClient && (() => i18n.get('filesCollection.onbeforeunloadMessage')),
       onBeforeUpload: beforeUpload,
-      allowClientCode: false, // Disallow remove files from Client
+      allowClientCode: false // Disallow remove files from Client
     })
   }
 }
