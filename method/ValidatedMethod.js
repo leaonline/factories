@@ -1,9 +1,8 @@
 /* global Roles */
 import { Meteor } from 'meteor/meteor'
-import { ValidatedMethod } from 'meteor/mdg:validated-method'
 import { PermissionDeniedError } from '../common/PermissionDeniedError'
 
-const PermissionsMixin = function (options) {
+export const PermissionsMixin = function (options) {
   const runFct = options.run
   options.run = function run (...args) {
     const exception = options.isPublic || (options.permission && options.permission(...args))
@@ -22,7 +21,7 @@ const PermissionsMixin = function (options) {
   return options
 }
 
-const RoleMixin = function (options) {
+export const RoleMixin = function (options) {
   if (options.roles) {
     const runFct = options.run
     options.run = function run (...args) {
@@ -42,7 +41,7 @@ const RoleMixin = function (options) {
   return options
 }
 
-const ErrorLogMixin = function (options) {
+export const ErrorLogMixin = function (options) {
   // OVERRIDE RUN
   if (options.log) {
     const { log } = options
@@ -58,18 +57,3 @@ const ErrorLogMixin = function (options) {
   }
   return options
 }
-
-class ExtendedValidatedMethod extends ValidatedMethod {
-  constructor (methodDefinition) {
-    // ADD DEFAULT MIXINS
-    if (Array.isArray(methodDefinition.mixins)) {
-      methodDefinition.mixins = methodDefinition.mixins.concat(ErrorLogMixin, RoleMixin, PermissionsMixin)
-    } else {
-      methodDefinition.mixins = [ErrorLogMixin, RoleMixin, PermissionsMixin]
-    }
-
-    super(methodDefinition)
-  }
-}
-
-export { ExtendedValidatedMethod as default }

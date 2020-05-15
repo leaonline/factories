@@ -1,7 +1,6 @@
 import { RateLimiterRegistry } from './RateLimiterRegistry'
 import { check } from 'meteor/check'
 import { isObject } from '../utils'
-import { Accounts } from 'meteor/accounts-base'
 
 export const rateLimitMethods = methods => {
   check(methods, [isObject])

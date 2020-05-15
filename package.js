@@ -1,7 +1,7 @@
 /* eslint-env meteor */
 Package.describe({
   name: 'leaonline:factories',
-  version: '1.1.0',
+  version: '1.2.0',
   // Brief, one-line summary of the package.
   summary: 'Provides an easy way to create Meteor Collections, Methods, Publications using factory methods.',
   // URL to the Git repository containing the source code for this package.
@@ -12,9 +12,11 @@ Package.describe({
 })
 
 Package.onUse(function (api) {
-  api.versionsFrom('1.8.1')
+  api.versionsFrom('1.6')
   api.use('ecmascript')
-  api.mainModule('factories.js')
+  api.use('sha')
+  api.mainModule('factories-client.js', 'client')
+  api.mainModule('factories-server.js', 'server')
 })
 
 Package.onTest(function (api) {

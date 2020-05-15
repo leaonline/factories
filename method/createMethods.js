@@ -1,15 +1,15 @@
 import { Meteor } from 'meteor/meteor'
 import { check } from 'meteor/check'
-import { isObject, maybe } from '../utils'
-import ValidatedMethod from './ValidatedMethod'
+import { isObject, maybe, isClass } from '../utils'
 
-export const getCreateMethod = (schemaResolver, validate = true, useRoles = true) => ({ name, schema, run, roles, group, isPublic }) => {
+export const getCreateMethod = (ValidatedMethod, schemaResolver) => ({ name, schema, run, roles, group, isPublic }) => {
+  check(ValidatedMethod, isClass)
   check(name, String)
   check(schema, isObject)
   check(run, Function)
   check(isPublic, maybe(Boolean))
-  check(roles, isPublic ? maybe([String]) : [String])
-  check(group, isPublic ? maybe(String) : String)
+  check(roles, maybe([String]))
+  check(group, maybe(String))
 
   const validationSchema = schemaResolver(schema)
   const validate = function validate (document = {}) {
@@ -23,8 +23,8 @@ export const getCreateMethod = (schemaResolver, validate = true, useRoles = true
   return validatedMethod
 }
 
-export const getCreateMethods = schemaResolver => {
-  const createMethod = getCreateMethod(schemaResolver)
+export const getCreateMethods = (ValidatedMethod, schemaResolver) => {
+  const createMethod = getCreateMethod(ValidatedMethod, schemaResolver)
   return methods => {
     check(methods, [isObject])
     return methods.map(method => {

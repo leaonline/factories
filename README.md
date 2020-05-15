@@ -4,14 +4,17 @@
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ![GitHub](https://img.shields.io/github/license/leaonline/factories)
 
+
 Provides an easy way to create Meteor Collections, Methods, Publications using factory methods.
 
 ## History
 
-- 1.2.0
- - reorganized package structure
- - code splitting for server and client
- - updated `ostrio:files` to 1.14.1
+##### 1.2.0
+
+- reorganized package structure
+- code splitting for server and client
+- updated `ostrio:files` to 1.14.1
+- remove dependency to `leaonline:errors`
 
 ## How to use this package
 
@@ -58,7 +61,9 @@ the file data in GridFS. In order to create a bucket, please follow the [new Gri
 #### Server
 
 ```javascript
-const createFilesCollection = getCreateFilesCollection({ i18n, fs, bucket, createObjectId })
+import { FilesCollection } from 'meteor/ostrio:files'
+
+const createFilesCollection = getCreateFilesCollection(FilesColletion, { i18n, fs, bucket, createObjectId })
 const MyFilesCollection = createFilesCollection({ 
   name, 
   collection, 
@@ -74,10 +79,14 @@ const MyFilesCollection = createFilesCollection({
 })
 ```
 
+The `FilesCollection` needs to be injected in order to avoid hard coupling of the package with `ostrio:files`.
+
 #### Client
 
 ```javascript
-const createFilesCollection = getCreateFilesCollection({ i18n })
+import { FilesCollection } from 'meteor/ostrio:files'
+
+const createFilesCollection = getCreateFilesCollection(FilesCollection, { i18n })
 const MyFilesCollection = createFilesCollection({  name, collection, ddp, roles, group, debug, maxSize, extensions, onBeforeUpload })
 ```
 
@@ -87,12 +96,13 @@ Validated Meteor Methods can be created as with [`mdg:validated-method`](https:/
 but with extended options (implemented via mixins):
 
 ```javascript
+import { ValidatedMethod } from 'meteor/mdg:validated-method'
 import SimpleSchema from 'simpl-schema'
 
 const validate = true
 const useRoles = true
 const schemaResolver = (schema, options) => new SimpleSchema(schema, options)
-const createMethod = getCreateMethod(schemaResolver, validate, useRoles)
+const createMethod = getCreateMethod(ValidatedMethod, schemaResolver, validate, useRoles)
 const validatedMethod = createMethod({
   name: 'updatePost',
   schema: {
@@ -108,6 +118,11 @@ const validatedMethod = createMethod({
 })
 ```
 
+We need to inject `ValidatedMethod` in order to avoid hard coupling between the `mdg:validated-method` package and this 
+package.
+
+#### Method parameters
+ 
 The following parameters are defined:
 
 `name`
@@ -159,6 +174,8 @@ createPublication({
     }
 }) 
 ```
+
+`ValidatedPublication` is an internal class and there is no need to inject this for now.
 
 ### Create HTTP Route (via WebApp connect handlers)
 

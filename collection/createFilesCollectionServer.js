@@ -1,8 +1,7 @@
 /* global Roles */
 import { Meteor } from 'meteor/meteor'
-import { FilesCollection } from 'meteor/ostrio:files'
 
-export const getCreateFilesCollection = ({ i18n, fs, bucket, createObjectId }) => {
+export const getCreateFilesCollection = (FilesCollection, { i18n, fs, bucket, createObjectId }) => {
   return ({ name, collection, ddp, allowedOrigins, roles, group, debug, maxSize, extensions, onBeforeUpload, onAfterUpload }) => {
     const maxSizeKb = maxSize / 1024000
     const checkSize = (file) => {
